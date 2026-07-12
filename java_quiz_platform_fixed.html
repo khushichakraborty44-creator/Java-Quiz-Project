@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Java Mastery Quiz</title>
+<style>
+:root {
+  --bg:#07111f; --panel:rgba(16,28,49,.78); --panel2:rgba(10,21,37,.9);
+  --text:#f5f7fb; --muted:#a9b5c7; --accent:#7c5cff; --accent2:#00d4ff;
+  --good:#31d0aa; --bad:#ff6680; --warn:#ffcc66; --border:rgba(255,255,255,.1);
+}
+*{box-sizing:border-box} html{scroll-behavior:smooth}
+body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial;background:
+radial-gradient(circle at 10% 20%,rgba(124,92,255,.2),transparent 26%),
+radial-gradient(circle at 90% 10%,rgba(0,212,255,.16),transparent 25%),
+linear-gradient(135deg,#050b14,#0b1525 50%,#07111f);color:var(--text);min-height:100vh;overflow-x:hidden}
+body:before{content:"";position:fixed;inset:0;background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);background-size:35px 35px;pointer-events:none}
+.orb{position:fixed;border-radius:50%;filter:blur(60px);opacity:.35;animation:float 8s ease-in-out infinite;pointer-events:none}
+.o1{width:250px;height:250px;background:#7048ff;left:-80px;top:25%} .o2{width:300px;height:300px;background:#00b9e8;right:-100px;top:50%;animation-delay:-3s}
+@keyframes float{50%{transform:translateY(-30px) scale(1.08)}}
+.container{width:min(1180px,92%);margin:auto;position:relative;z-index:1}
+header{padding:72px 0 38px;text-align:center}
+.badge{display:inline-flex;gap:8px;align-items:center;padding:8px 14px;border:1px solid var(--border);border-radius:999px;background:rgba(255,255,255,.055);color:#cfd7e6;font-size:.85rem;backdrop-filter:blur(12px)}
+h1{font-size:clamp(2.2rem,6vw,5rem);line-height:.96;margin:20px 0 14px;letter-spacing:-.06em;background:linear-gradient(90deg,#fff,#b9c7ff,#69e5ff);-webkit-background-clip:text;color:transparent;animation:reveal .8s ease both}
+@keyframes reveal{from{opacity:0;transform:translateY(20px)}}
+.subtitle{max-width:760px;margin:auto;color:var(--muted);font-size:1.05rem;line-height:1.7}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:28px 0}
+.stat{padding:18px;border:1px solid var(--border);border-radius:20px;background:var(--panel);backdrop-filter:blur(18px);box-shadow:0 15px 40px rgba(0,0,0,.18)}
+.stat strong{font-size:1.55rem;display:block} .stat span{color:var(--muted);font-size:.85rem}
+.controls{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:18px}
+select,button{font:inherit} select{flex:1;min-width:220px;padding:14px 16px;border-radius:14px;border:1px solid var(--border);background:#101d31;color:#fff;outline:none}
+.btn{border:0;border-radius:14px;padding:13px 18px;color:#fff;cursor:pointer;font-weight:700;transition:.25s;box-shadow:0 10px 25px rgba(0,0,0,.18)}
+.btn:hover{transform:translateY(-2px)} .primary{background:linear-gradient(135deg,var(--accent),#4a89ff)} .ghost{background:rgba(255,255,255,.07);border:1px solid var(--border)}
+.quiz-layout{display:grid;grid-template-columns:1fr 310px;gap:22px;align-items:start}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:26px;backdrop-filter:blur(18px);box-shadow:0 20px 60px rgba(0,0,0,.22)}
+.quiz-card{padding:28px;min-height:540px;animation:pop .35s ease}
+@keyframes pop{from{opacity:.4;transform:scale(.985)}}
+.topline{display:flex;justify-content:space-between;gap:12px;color:var(--muted);font-size:.9rem}
+.progress{height:10px;background:rgba(255,255,255,.08);border-radius:99px;overflow:hidden;margin:18px 0 28px}
+.progress>div{height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:.4s}
+.topic-chip{display:inline-block;padding:7px 11px;border-radius:999px;background:rgba(124,92,255,.15);color:#c9bdff;font-size:.82rem;margin-bottom:12px}
+.question{font-size:clamp(1.25rem,2.4vw,1.9rem);line-height:1.35;margin:0 0 22px}
+.options{display:grid;gap:12px}
+.option{display:flex;gap:13px;align-items:center;padding:16px;border:1px solid var(--border);border-radius:16px;background:rgba(255,255,255,.035);cursor:pointer;transition:.22s;text-align:left;color:#fff;width:100%}
+.option:hover{transform:translateX(5px);border-color:rgba(124,92,255,.55);background:rgba(124,92,255,.09)}
+.letter{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:rgba(255,255,255,.08);font-weight:800;flex:none}
+.option.correct{border-color:var(--good);background:rgba(49,208,170,.13)} .option.wrong{border-color:var(--bad);background:rgba(255,102,128,.12)}
+.feedback{margin-top:18px;padding:15px 17px;border-radius:14px;display:none;line-height:1.55}
+.feedback.show{display:block;animation:reveal .3s ease} .feedback.good{background:rgba(49,208,170,.13);border:1px solid rgba(49,208,170,.4)} .feedback.bad{background:rgba(255,102,128,.12);border:1px solid rgba(255,102,128,.4)}
+.nav{display:flex;justify-content:space-between;gap:12px;margin-top:22px}
+.sidebar{padding:22px;position:sticky;top:18px}
+.sidebar h3{margin-top:0} .topic-list{display:grid;gap:8px;max-height:410px;overflow:auto;padding-right:5px}
+.topic-btn{padding:11px 12px;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid transparent;color:#dbe4f2;text-align:left;cursor:pointer;transition:.2s}
+.topic-btn:hover,.topic-btn.active{border-color:var(--accent);background:rgba(124,92,255,.12)}
+.roadmap{margin:60px 0 70px} .section-title{font-size:clamp(1.8rem,4vw,3rem);margin-bottom:10px} .section-text{color:var(--muted);max-width:780px;line-height:1.7}
+.road-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:24px}
+.road-card{padding:24px;position:relative;overflow:hidden} .road-card:after{content:"";position:absolute;width:100px;height:100px;border-radius:50%;right:-30px;top:-30px;background:linear-gradient(135deg,var(--accent),var(--accent2));filter:blur(30px);opacity:.25}
+.icon{font-size:2rem} .road-card h3{margin:12px 0 8px} .road-card p,.road-card li{color:var(--muted);line-height:1.6} .road-card ul{padding-left:20px}
+.highlight{color:#9ceeff;font-weight:800} footer{text-align:center;color:var(--muted);padding:28px}
+.creator-section{margin:10px 0 42px}
+.creator-card{padding:28px;display:flex;align-items:center;justify-content:space-between;gap:24px}
+.creator-card h2{font-size:clamp(1.7rem,4vw,2.6rem);margin:14px 0 8px}
+.creator-card p{color:var(--muted);line-height:1.7;max-width:760px}
+.creator-action{white-space:nowrap;text-decoration:none;display:inline-block}
+.result{text-align:center;padding:32px} .result .score-ring{width:160px;height:160px;border-radius:50%;display:grid;place-items:center;margin:20px auto;background:conic-gradient(var(--accent) var(--pct),rgba(255,255,255,.08) 0);position:relative}
+.score-ring:before{content:"";position:absolute;inset:13px;border-radius:50%;background:#0c1829} .score-ring strong{z-index:1;font-size:2.2rem}
+@media(max-width:900px){.quiz-layout{grid-template-columns:1fr}.sidebar{position:static}.road-grid{grid-template-columns:1fr}}
+@media(max-width:600px){header{padding-top:42px}.stats{grid-template-columns:repeat(2,1fr)}.quiz-card{padding:20px}.nav{flex-wrap:wrap}.nav .btn{flex:1}.creator-card{flex-direction:column;align-items:flex-start}.creator-action{width:100%;text-align:center}}
+</style>
+</head>
+<body>
+<div class="orb o1"></div><div class="orb o2"></div>
+<div class="container">
+<header>
+  <div class="badge">☕ Java Interview Practice Platform</div>
+  <h1>Java Mastery Quiz</h1>
+  <p class="subtitle">Practice Java fundamentals, OOP, debugging, Spring Boot, REST APIs, and database concepts through a focused interactive quiz.</p>
+</header>
+
+<section class="stats">
+  <div class="stat"><strong id="totalStat">81</strong><span>Total questions</span></div>
+  <div class="stat"><strong id="answeredStat">0</strong><span>Answered</span></div>
+  <div class="stat"><strong id="correctStat">0</strong><span>Correct</span></div>
+  <div class="stat"><strong id="accuracyStat">0%</strong><span>Accuracy</span></div>
+</section>
+
+<div class="controls">
+  <select id="topicSelect"></select>
+  <button class="btn primary" onclick="startQuiz()">Start / Restart Quiz</button>
+  <button class="btn ghost" onclick="shuffleQuiz()">Shuffle Questions</button>
+</div>
+
+<section class="quiz-layout">
+  <main class="card quiz-card" id="quizCard"></main>
+  <aside class="card sidebar">
+    <h3>Topics</h3>
+    <div class="topic-list" id="topicList"></div>
+  </aside>
+</section>
+
+<section class="roadmap" id="roadmap">
+  <div class="badge">🚀 Career Roadmap</div>
+  <h2 class="section-title">From Java Learner to Job-Ready Developer</h2>
+  <p class="section-text">MCQs build fundamentals, but top-company interviews require practical problem-solving. Build real-time projects, integrate AI features, deploy them, and explain every architectural decision confidently.</p>
+  <div class="road-grid">
+    <article class="card road-card">
+      <div class="icon">📊</div><h3>Data Analytics + GenAI</h3>
+      <p>Learn Excel, SQL, Python, Pandas, Power BI, statistics, and AI-assisted analysis.</p>
+      <ul><li>AI sales dashboard</li><li>Customer churn analysis</li><li>Natural-language SQL assistant</li></ul>
+    </article>
+    <article class="card road-card">
+      <div class="icon">🧠</div><h3>Data Science + AI</h3>
+      <p>Learn Python, NumPy, machine learning, model evaluation, APIs, and deployment.</p>
+      <ul><li>Fraud detection system</li><li>Recommendation engine</li><li>AI document classifier</li></ul>
+    </article>
+    <article class="card road-card">
+      <div class="icon">🌐</div><h3>Full-Stack Development</h3>
+      <p>Learn Java, Spring Boot, React, SQL, Git, Docker, cloud deployment, and GenAI APIs.</p>
+      <ul><li>AI job tracker</li><li>Smart learning platform</li><li>Real-time support chatbot</li></ul>
+    </article>
+  </div>
+  <div class="card road-card" style="margin-top:18px">
+    <h3>Recommended order</h3>
+    <p><span class="highlight">1.</span> Java fundamentals → <span class="highlight">2.</span> OOP and collections → <span class="highlight">3.</span> SQL and Git → <span class="highlight">4.</span> Spring Boot REST APIs → <span class="highlight">5.</span> React frontend → <span class="highlight">6.</span> AI integration → <span class="highlight">7.</span> Docker, testing, deployment, and interview preparation.</p>
+  </div>
+</section>
+<section class="creator-section">
+  <div class="card creator-card">
+    <div>
+      <span class="badge">👨‍💻 Developer Profile</span>
+      <h2>Made by SK Sahil</h2>
+      <p><strong>Freelance AI Developer</strong> and <strong>German University Graduate</strong>.</p>
+      <p>For help with major college projects, AI integration, full-stack development, data analytics, data science, documentation, or deployment, ask for professional project guidance.</p>
+    </div>
+    <a class="btn primary creator-action" href="#roadmap">Explore Project Roadmap</a>
+  </div>
+</section>
+<footer>Made by SK Sahil · Freelance AI Developer · German University Graduate</footer>
+</div>
+
+<script>
+const allQuestions = [{"topic": "Variables & Data Types", "q": "Which keyword is used to declare an integer variable in Java?", "options": ["integer", "int", "number", "num"], "answer": 1, "explanation": "int stores whole numbers such as 10, 25, or -5."}, {"topic": "Variables & Data Types", "q": "Which data type stores decimal numbers?", "options": ["boolean", "char", "double", "String"], "answer": 2, "explanation": "double stores decimal values with high precision."}, {"topic": "Variables & Data Types", "q": "What is the default value of an instance-level int variable?", "options": ["null", "0", "1", "Undefined"], "answer": 1, "explanation": "Java automatically initializes an instance int variable to zero."}, {"topic": "Variables & Data Types", "q": "Which data type stores a single character?", "options": ["String", "char", "character", "text"], "answer": 1, "explanation": "char stores one Unicode character inside single quotes."}, {"topic": "Variables & Data Types", "q": "Which declaration is correct?", "options": ["int age = \"25\";", "int age = 25;", "integer age = 25;", "age int = 25;"], "answer": 1, "explanation": "Java variables are declared using data type, variable name, and value."}, {"topic": "Variables & Data Types", "q": "Which data type stores only true or false?", "options": ["bit", "bool", "boolean", "binary"], "answer": 2, "explanation": "The boolean type represents true or false conditions."}, {"topic": "Variables & Data Types", "q": "Which of the following is a reference data type?", "options": ["int", "double", "boolean", "String"], "answer": 3, "explanation": "String is a class and therefore a reference data type."}, {"topic": "Operators", "q": "Which operator is used for addition?", "options": ["-", "+", "*", "/"], "answer": 1, "explanation": "The + operator adds numeric values and concatenates strings."}, {"topic": "Operators", "q": "What is the result of 10 % 3?", "options": ["3", "1", "0", "3.33"], "answer": 1, "explanation": "The modulus operator % returns the remainder after division."}, {"topic": "Operators", "q": "Which operator checks whether two values are equal?", "options": ["=", "==", "!=", "==="], "answer": 1, "explanation": "The == operator compares primitive values for equality."}, {"topic": "Operators", "q": "What does the ++ operator do?", "options": ["Decreases a value by one", "Multiplies a value by two", "Increases a value by one", "Resets a value to zero"], "answer": 2, "explanation": "The increment operator adds one to a variable."}, {"topic": "Operators", "q": "Which logical operator returns true when both conditions are true?", "options": ["||", "&&", "!", "&="], "answer": 1, "explanation": "Logical AND returns true only when both conditions are true."}, {"topic": "Operators", "q": "What is the result of 5 > 3?", "options": ["true", "false", "5", "3"], "answer": 0, "explanation": "Five is greater than three, so the comparison returns true."}, {"topic": "Operators", "q": "Which operator means “not equal to”?", "options": ["<>", "=!", "!=", "!=="], "answer": 2, "explanation": "The != operator checks whether two values are different."}, {"topic": "If-Else", "q": "Which statement is used to check a condition?", "options": ["loop", "if", "switcher", "check"], "answer": 1, "explanation": "The if statement executes code when a condition is true."}, {"topic": "If-Else", "q": "What will be printed for: int age = 20; if (age >= 18) System.out.println(\"Adult\");", "options": ["Child", "Adult", "Nothing", "Error"], "answer": 1, "explanation": "The condition is true because 20 is greater than or equal to 18."}, {"topic": "If-Else", "q": "Which block executes when the if condition is false?", "options": ["default", "finally", "else", "catch"], "answer": 2, "explanation": "The else block handles the false condition."}, {"topic": "If-Else", "q": "Which keyword checks another condition after an if condition fails?", "options": ["else if", "otherwise", "then if", "next if"], "answer": 0, "explanation": "else if allows multiple conditions to be checked sequentially."}, {"topic": "If-Else", "q": "Which condition checks whether number is positive?", "options": ["number < 0", "number == 0", "number > 0", "number != number"], "answer": 2, "explanation": "A positive number is always greater than zero."}, {"topic": "If-Else", "q": "What is a nested if statement?", "options": ["An if statement inside another if statement", "An if statement inside a loop only", "Two unrelated conditions", "An invalid Java statement"], "answer": 0, "explanation": "Nested conditions are used when one condition depends on another."}, {"topic": "If-Else", "q": "Which statement is useful when comparing one value against multiple fixed cases?", "options": ["while", "switch", "try", "return"], "answer": 1, "explanation": "A switch statement provides cleaner handling of multiple fixed options."}, {"topic": "Loops", "q": "Which loop is commonly used when the number of iterations is known?", "options": ["for", "while", "do-while", "if"], "answer": 0, "explanation": "A for loop is suitable when the repetition count is known."}, {"topic": "Loops", "q": "Which loop checks its condition before executing the body?", "options": ["do-while", "while", "switch", "if-else"], "answer": 1, "explanation": "A while loop checks the condition before every iteration."}, {"topic": "Loops", "q": "Which loop executes at least once?", "options": ["for", "while", "do-while", "Enhanced for"], "answer": 2, "explanation": "A do-while loop checks its condition after executing the body."}, {"topic": "Loops", "q": "What will this loop print? for (int i = 1; i <= 3; i++) System.out.print(i + \" \");", "options": ["0 1 2", "1 2 3", "1 2 3 4", "Infinite numbers"], "answer": 1, "explanation": "The loop begins at 1 and continues while i is less than or equal to 3."}, {"topic": "Loops", "q": "Which keyword immediately terminates a loop?", "options": ["stop", "exit", "break", "returnloop"], "answer": 2, "explanation": "The break keyword exits the nearest loop immediately."}, {"topic": "Loops", "q": "Which keyword skips the current iteration?", "options": ["skip", "continue", "break", "pass"], "answer": 1, "explanation": "continue skips the remaining code and begins the next iteration."}, {"topic": "Loops", "q": "Which loop is specifically useful for traversing arrays and collections?", "options": ["Enhanced for loop", "if statement", "switch statement", "try-catch"], "answer": 0, "explanation": "The enhanced for loop directly accesses each element of an array or collection."}, {"topic": "Functions & Methods", "q": "What is a function called inside a Java class?", "options": ["Package", "Method", "Object", "Variable"], "answer": 1, "explanation": "Java defines functions as methods inside classes."}, {"topic": "Functions & Methods", "q": "Which keyword returns a value from a method?", "options": ["send", "give", "return", "output"], "answer": 2, "explanation": "The return keyword sends a value back to the method caller."}, {"topic": "Functions & Methods", "q": "What does void indicate?", "options": ["The method returns an integer", "The method returns no value", "The method is private", "The method cannot execute"], "answer": 1, "explanation": "A void method performs an action without returning a result."}, {"topic": "Functions & Methods", "q": "Which is a valid method declaration?", "options": ["add(int a, int b) int", "int add(int a, int b)", "function int add(a, b)", "method add int(a, b)"], "answer": 1, "explanation": "A method declaration includes return type, method name, and parameters."}, {"topic": "Functions & Methods", "q": "What are values passed to a method called?", "options": ["Classes", "Arguments", "Packages", "Constructors"], "answer": 1, "explanation": "Arguments are actual values supplied when calling a method."}, {"topic": "Functions & Methods", "q": "What is method overloading?", "options": ["Creating methods with the same name but different parameters", "Calling a method repeatedly", "Creating methods in different packages", "Deleting an existing method"], "answer": 0, "explanation": "Overloading allows one method name to support different parameter lists."}, {"topic": "Functions & Methods", "q": "Which keyword allows a method to be called without creating an object?", "options": ["public", "final", "static", "abstract"], "answer": 2, "explanation": "A static method belongs to the class rather than an object."}, {"topic": "OOP", "q": "What is a class?", "options": ["A loop structure", "A blueprint for creating objects", "A database table", "A Java package"], "answer": 1, "explanation": "A class defines the data and behaviour of its objects."}, {"topic": "OOP", "q": "What is an object?", "options": ["An instance of a class", "A Java keyword", "A type of loop", "A package name"], "answer": 0, "explanation": "An object is created from a class and contains its own state."}, {"topic": "OOP", "q": "Which keyword creates an object?", "options": ["create", "object", "new", "make"], "answer": 2, "explanation": "The new keyword creates an instance of a class."}, {"topic": "OOP", "q": "Which OOP principle hides internal data from direct access?", "options": ["Inheritance", "Encapsulation", "Polymorphism", "Compilation"], "answer": 1, "explanation": "Encapsulation protects data using private fields and controlled methods."}, {"topic": "OOP", "q": "Which keyword is used for class inheritance?", "options": ["implements", "inherits", "extends", "superclass"], "answer": 2, "explanation": "A child class uses extends to inherit from a parent class."}, {"topic": "OOP", "q": "What is polymorphism?", "options": ["Storing multiple variables", "One interface or method behaving in different forms", "Hiding class fields", "Creating packages"], "answer": 1, "explanation": "Polymorphism allows the same method call to produce different behaviour."}, {"topic": "OOP", "q": "What is abstraction?", "options": ["Showing every implementation detail", "Hiding unnecessary details and exposing essential behaviour", "Copying one class into another", "Converting an object into a variable"], "answer": 1, "explanation": "Abstraction focuses on what an object does rather than how it does it."}, {"topic": "OOP", "q": "What is a constructor?", "options": ["A method used to destroy objects", "A special method used to initialize objects", "A method that must return an integer", "A loop inside a class"], "answer": 1, "explanation": "A constructor runs automatically when an object is created."}, {"topic": "OOP", "q": "Which keyword refers to the current object?", "options": ["self", "current", "this", "object"], "answer": 2, "explanation": "The this keyword refers to the current class instance."}, {"topic": "OOP", "q": "Which keyword prevents a class from being inherited?", "options": ["static", "private", "final", "protected"], "answer": 2, "explanation": "A final class cannot be extended by another class."}, {"topic": "Errors & Exceptions", "q": "Which error occurs when Java syntax rules are violated?", "options": ["Logical error", "Syntax error", "Runtime error", "Database error"], "answer": 1, "explanation": "A syntax error occurs when code does not follow Java grammar."}, {"topic": "Errors & Exceptions", "q": "Which error occurs while the program is running?", "options": ["Compile-time error", "Runtime error", "Documentation error", "Design error"], "answer": 1, "explanation": "Runtime errors occur after the program successfully compiles."}, {"topic": "Errors & Exceptions", "q": "Which block contains code that may produce an exception?", "options": ["if", "try", "throwable", "error"], "answer": 1, "explanation": "Risky code is placed inside a try block."}, {"topic": "Errors & Exceptions", "q": "Which block handles an exception?", "options": ["catch", "final", "error", "default"], "answer": 0, "explanation": "A catch block handles an exception thrown from a try block."}, {"topic": "Errors & Exceptions", "q": "Which block normally executes whether an exception occurs or not?", "options": ["catch", "finally", "throw", "default"], "answer": 1, "explanation": "The finally block is commonly used for cleanup operations."}, {"topic": "Errors & Exceptions", "q": "Which exception occurs when dividing an integer by zero?", "options": ["NullPointerException", "ArithmeticException", "ArrayIndexOutOfBoundsException", "IOException"], "answer": 1, "explanation": "Integer division by zero causes an ArithmeticException."}, {"topic": "Errors & Exceptions", "q": "Which exception occurs when accessing an invalid array index?", "options": ["NumberFormatException", "ArrayIndexOutOfBoundsException", "ClassNotFoundException", "SQLException"], "answer": 1, "explanation": "This exception occurs when an index is outside the array’s valid range."}, {"topic": "Errors & Exceptions", "q": "Which exception commonly occurs when using a null object reference?", "options": ["NullPointerException", "ArithmeticException", "IOException", "InterruptedException"], "answer": 0, "explanation": "It occurs when code tries to access a method or field through null."}, {"topic": "Debugging & IDE", "q": "What is debugging?", "options": ["Writing documentation", "Finding and fixing errors in code", "Installing Java", "Creating a database"], "answer": 1, "explanation": "Debugging identifies the cause of errors and corrects them."}, {"topic": "Debugging & IDE", "q": "What is a breakpoint?", "options": ["A point where code is permanently deleted", "A point where program execution pauses", "A Java compilation command", "A database connection"], "answer": 1, "explanation": "A breakpoint pauses execution so variable values can be inspected."}, {"topic": "Debugging & IDE", "q": "Which IDE is commonly used for Java development?", "options": ["IntelliJ IDEA", "Photoshop", "Excel", "Power BI"], "answer": 0, "explanation": "IntelliJ IDEA provides coding, debugging, testing, and project-management tools."}, {"topic": "Debugging & IDE", "q": "What does Step Over do during debugging?", "options": ["Deletes the current line", "Executes the current line without entering called methods", "Stops the application", "Restarts the IDE"], "answer": 1, "explanation": "Step Over runs the line and moves to the next line in the current method."}, {"topic": "Debugging & IDE", "q": "What does Step Into do?", "options": ["Enters the method being called", "Skips the current method", "Ends debugging", "Deletes the breakpoint"], "answer": 0, "explanation": "Step Into moves inside a called method for detailed debugging."}, {"topic": "Debugging & IDE", "q": "What is the purpose of the IDE console?", "options": ["To draw diagrams", "To display output, logs, and error messages", "To store database tables", "To create classes automatically"], "answer": 1, "explanation": "The console helps developers inspect program execution and failures."}, {"topic": "Debugging & IDE", "q": "What is a stack trace?", "options": ["A list of database records", "A report showing the sequence of method calls leading to an error", "A Java collection", "A project folder structure"], "answer": 1, "explanation": "A stack trace helps locate the file, method, and line where an exception occurred."}, {"topic": "Debugging & IDE", "q": "Which action should be performed first when debugging an exception?", "options": ["Delete the entire project", "Read the exception message and stack trace", "Reinstall Java", "Change all variables"], "answer": 1, "explanation": "The error message and stack trace usually identify the cause and location."}, {"topic": "Spring Boot", "q": "What is Spring Boot?", "options": ["A Java database", "A framework for quickly building Spring applications", "A frontend library", "A Java compiler"], "answer": 1, "explanation": "Spring Boot simplifies the development of production-ready Java applications."}, {"topic": "Spring Boot", "q": "Which annotation marks the main Spring Boot application class?", "options": ["@SpringApplication", "@SpringBootApplication", "@BootApplication", "@MainApplication"], "answer": 1, "explanation": "This annotation enables configuration, component scanning, and auto-configuration."}, {"topic": "Spring Boot", "q": "Which method starts a Spring Boot application?", "options": ["Spring.start()", "SpringApplication.run()", "Application.execute()", "Boot.runApp()"], "answer": 1, "explanation": "This method starts the Spring application context and embedded server."}, {"topic": "Spring Boot", "q": "Which annotation creates a REST API controller?", "options": ["@ControllerOnly", "@RestController", "@ApiClass", "@RestService"], "answer": 1, "explanation": "@RestController returns response data directly, usually as JSON."}, {"topic": "Spring Boot", "q": "Which annotation maps HTTP GET requests?", "options": ["@GetMapping", "@ReadMapping", "@FetchMapping", "@SelectMapping"], "answer": 0, "explanation": "@GetMapping handles HTTP GET requests used to retrieve data."}, {"topic": "Spring Boot", "q": "Which annotation maps HTTP POST requests?", "options": ["@CreateMapping", "@PostMapping", "@InsertMapping", "@SendMapping"], "answer": 1, "explanation": "@PostMapping handles HTTP POST requests used to create data."}, {"topic": "Spring Boot", "q": "Which annotation injects a dependency automatically?", "options": ["@Autowired", "@Injected", "@Dependency", "@ObjectCreate"], "answer": 0, "explanation": "@Autowired asks Spring to provide the required dependency automatically."}, {"topic": "Spring Boot", "q": "Which annotation identifies a service-layer class?", "options": ["@Controller", "@Service", "@RepositoryOnly", "@Model"], "answer": 1, "explanation": "@Service marks a class containing business logic."}, {"topic": "Spring Boot", "q": "Which annotation identifies a database repository component?", "options": ["@Database", "@Repository", "@Storage", "@Table"], "answer": 1, "explanation": "@Repository marks the data-access layer and supports exception translation."}, {"topic": "Spring Boot", "q": "What is dependency injection?", "options": ["Manually creating every object inside a class", "Providing required objects to a class from an external container", "Connecting Java directly to HTML", "Adding dependencies only to Maven"], "answer": 1, "explanation": "Dependency injection reduces tight coupling between classes."}, {"topic": "REST API & Database", "q": "Which annotation extracts data from the request body?", "options": ["@BodyData", "@RequestBody", "@RequestData", "@JsonBody"], "answer": 1, "explanation": "@RequestBody converts incoming JSON data into a Java object."}, {"topic": "REST API & Database", "q": "Which annotation extracts a value from a URL path?", "options": ["@PathVariable", "@UrlValue", "@RequestBody", "@RouteData"], "answer": 0, "explanation": "@PathVariable reads dynamic values such as /users/{id}."}, {"topic": "REST API & Database", "q": "Which annotation extracts a query parameter?", "options": ["@QueryValue", "@RequestParam", "@PathVariable", "@ParameterBody"], "answer": 1, "explanation": "@RequestParam reads URL parameters such as ?name=Sahil."}, {"topic": "REST API & Database", "q": "Which interface is commonly extended for basic CRUD operations?", "options": ["CrudRepository", "DatabaseController", "EntityManagerClass", "DataService"], "answer": 0, "explanation": "CrudRepository provides predefined save, find, update, and delete operations."}, {"topic": "REST API & Database", "q": "Which annotation marks a Java class as a database entity?", "options": ["@TableClass", "@Entity", "@DatabaseObject", "@ModelClass"], "answer": 1, "explanation": "@Entity tells JPA that the class represents a database table."}, {"topic": "REST API & Database", "q": "Which annotation marks a primary key?", "options": ["@Key", "@Primary", "@Id", "@Unique"], "answer": 2, "explanation": "@Id identifies the primary-key field of an entity."}, {"topic": "REST API & Database", "q": "What does CRUD stand for?", "options": ["Create, Read, Update, Delete", "Copy, Run, Upload, Download", "Create, Remove, Undo, Display", "Compile, Read, Use, Debug"], "answer": 0, "explanation": "CRUD represents the four fundamental database operations."}, {"topic": "REST API & Database", "q": "Which file commonly stores Spring Boot configuration?", "options": ["settings.java", "application.properties", "spring.txt", "config.html"], "answer": 1, "explanation": "Database credentials, ports, and application settings are commonly stored there."}, {"topic": "REST API & Database", "q": "What is the default embedded server in Spring Boot?", "options": ["Apache HTTP Server", "Tomcat", "IIS", "Nginx"], "answer": 1, "explanation": "Spring Boot web applications normally use embedded Tomcat by default."}, {"topic": "REST API & Database", "q": "Which HTTP method is normally used to delete a resource?", "options": ["GET", "POST", "DELETE", "PATCH"], "answer": 2, "explanation": "The DELETE method requests removal of a resource from the server."}];
+const topics = ["All Topics"].concat(Array.from(new Set(allQuestions.map(function(q) { return q.topic; }))));
+let quiz = allQuestions.slice();
+let index = 0;
+let correct = 0;
+let answered = 0;
+let locked = false;
+
+const topicSelect = document.getElementById("topicSelect");
+const topicList = document.getElementById("topicList");
+const quizCard = document.getElementById("quizCard");
+const totalStat = document.getElementById("totalStat");
+const answeredStat = document.getElementById("answeredStat");
+const correctStat = document.getElementById("correctStat");
+const accuracyStat = document.getElementById("accuracyStat");
+
+function initializeTopics() {
+  topicSelect.innerHTML = "";
+  topicList.innerHTML = "";
+
+  topics.forEach(function(topic) {
+    const option = document.createElement("option");
+    option.value = topic;
+    option.textContent = topic;
+    topicSelect.appendChild(option);
+
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "topic-btn" + (topic === "All Topics" ? " active" : "");
+    button.textContent = topic;
+
+    button.addEventListener("click", function() {
+      topicSelect.value = topic;
+      document.querySelectorAll(".topic-btn").forEach(function(item) {
+        item.classList.remove("active");
+      });
+      button.classList.add("active");
+      startQuiz();
+    });
+
+    topicList.appendChild(button);
+  });
+
+  topicSelect.addEventListener("change", function() {
+    document.querySelectorAll(".topic-btn").forEach(function(item) {
+      item.classList.toggle("active", item.textContent === topicSelect.value);
+    });
+    startQuiz();
+  });
+}
+
+function startQuiz(){
+  if (!Array.isArray(allQuestions) || allQuestions.length === 0) {
+    quizCard.innerHTML = '<div class="result"><h2>Quiz data could not load.</h2><p>Open this file in Safari, Chrome, Edge, or another modern browser.</p></div>';
+    return;
+  }
+  const selected = topicSelect.value || "All Topics";
+  quiz=selected==="All Topics"?[...allQuestions]:allQuestions.filter(q=>q.topic===selected);
+  index=0; correct=0; answered=0; locked=false; updateStats(); render();
+}
+function shuffleQuiz(){ quiz.sort(()=>Math.random()-.5); index=0; correct=0; answered=0; locked=false; updateStats(); render(); }
+function updateStats(){
+  answeredStat.textContent=answered; correctStat.textContent=correct;
+  accuracyStat.textContent=answered?Math.round(correct/answered*100)+"%":"0%";
+  totalStat.textContent=quiz.length;
+}
+function render(){
+  if(index>=quiz.length) return renderResult();
+  locked=false; const q=quiz[index]; const letters=["A","B","C","D"];
+  quizCard.innerHTML=`
+    <div class="topline"><span>Question ${index+1} of ${quiz.length}</span><span>Score: ${correct} / ${answered}</span></div>
+    <div class="progress"><div style="width:${(index/quiz.length)*100}%"></div></div>
+    <span class="topic-chip">${q.topic}</span>
+    <h2 class="question">${q.q}</h2>
+    <div class="options">${q.options.map((o,i)=>`<button class="option" onclick="choose(${i},this)"><span class="letter">${letters[i]}</span><span>${escapeHtml(o)}</span></button>`).join("")}</div>
+    <div class="feedback" id="feedback"></div>
+    <div class="nav">
+      <button class="btn ghost" onclick="previous()" ${index===0?"disabled":""}>← Previous</button>
+      <button class="btn primary" id="nextBtn" onclick="next()" disabled>Next →</button>
+    </div>`;
+}
+function choose(i,el){
+  if(locked)return; locked=true; answered++;
+  const q=quiz[index], buttons=[...document.querySelectorAll(".option")];
+  buttons[q.answer].classList.add("correct");
+  const feedback=document.getElementById("feedback");
+  if(i===q.answer){correct++; feedback.className="feedback show good"; feedback.innerHTML="<strong>Correct.</strong> "+q.explanation;}
+  else{el.classList.add("wrong"); feedback.className="feedback show bad"; feedback.innerHTML="<strong>Incorrect.</strong> "+q.explanation;}
+  buttons.forEach(b=>b.disabled=true); document.getElementById("nextBtn").disabled=false; updateStats();
+}
+function next(){if(!locked)return; index++; render(); window.scrollTo({top:document.querySelector(".quiz-layout").offsetTop-20,behavior:"smooth"});}
+function previous(){if(index>0){index--; render();}}
+function renderResult(){
+  const pct=quiz.length?Math.round(correct/quiz.length*100):0;
+  const msg=pct>=80?"Excellent—interview-ready fundamentals!":pct>=60?"Good progress—revise weak topics and retry.":"Keep practising—focus on concepts before memorising.";
+  quizCard.innerHTML=`<div class="result"><div class="badge">Quiz Completed</div><div class="score-ring" style="--pct:${pct*3.6}deg"><strong>${pct}%</strong></div><h2>${correct} / ${quiz.length} Correct</h2><p style="color:var(--muted)">${msg}</p><button class="btn primary" onclick="startQuiz()">Practice Again</button></div>`;
+}
+function escapeHtml(s){return s.replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));}
+document.addEventListener("DOMContentLoaded", function() {
+  initializeTopics();
+  startQuiz();
+});
+</script>
+</body>
+</html>
